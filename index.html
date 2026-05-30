@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="家族資産管理帳">
+<title>家族資産管理帳</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#111;font-family:'Noto Serif JP',serif;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#111}::-webkit-scrollbar-thumb{background:#2e2a22;border-radius:4px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+// 実資産データ
+window.REAL_DATA = {"self": [{"id": 2, "type": "cash", "name": "BANK支店 円普通預金", "ticker": "", "amount": 1450000, "price": 1}, {"id": 4, "type": "cash", "name": "サファイア支店 普通預金", "ticker": "", "amount": 381708, "price": 1}, {"id": 5, "type": "cash", "name": "円普通預金 auじぶん", "ticker": "", "amount": 31281, "price": 1}, {"id": 6, "type": "cash", "name": "普通預金(有利息)", "ticker": "", "amount": 20, "price": 1}, {"id": 15, "type": "cash", "name": "代表口座 円普通 SBI", "ticker": "", "amount": 41941, "price": 1}, {"id": 16, "type": "cash", "name": "SBIハイブリッド預金②", "ticker": "", "amount": 610, "price": 1}, {"id": 17, "type": "cash", "name": "プレゼント 円普通", "ticker": "", "amount": 25039, "price": 1}, {"id": 18, "type": "cash", "name": "代表口座 米ドル普通", "ticker": "", "amount": 1708, "price": 1}, {"id": 19, "type": "cash", "name": "代表口座 米ドル定期", "ticker": "", "amount": 2064, "price": 1}, {"id": 26, "type": "cash", "name": "大森支店 普通 瀬戸信金", "ticker": "", "amount": 55621, "price": 1}, {"id": 27, "type": "cash", "name": "円普通預金 ソニー銀行", "ticker": "", "amount": 902716, "price": 1}, {"id": 31, "type": "cash", "name": "普通預金残高 三井住友", "ticker": "", "amount": 170191, "price": 1}, {"id": 34, "type": "cash", "name": "円預金 楽天銀行", "ticker": "", "amount": 37495, "price": 1}, {"id": 37, "type": "cash", "name": "BANK The 定期 あおぞら", "ticker": "", "amount": 2000000, "price": 1}, {"id": 38, "type": "cash", "name": "積立式定期 イオン銀行", "ticker": "", "amount": 28065, "price": 1}, {"id": 39, "type": "cash", "name": "積立式定期 イオン銀行②", "ticker": "", "amount": 11022, "price": 1}, {"id": 40, "type": "cash", "name": "米ドル 普通預金 イオン", "ticker": "", "amount": 6802, "price": 1}, {"id": 43, "type": "cash", "name": "米ドル 現金 SBI証券", "ticker": "", "amount": 172, "price": 1}, {"id": 46, "type": "gold", "name": "純金信託", "ticker": "1540", "amount": 77, "price": 21435}, {"id": 55, "type": "fund", "name": "eMAXIS Slim 国内株式(TOPIX)", "ticker": "", "amount": 228919, "price": 1}, {"id": 56, "type": "fund", "name": "eMAXIS Slim 国内株式(日経平均)", "ticker": "", "amount": 307761, "price": 1}, {"id": 57, "type": "fund", "name": "eMAXIS Slim 国内株式(TOPIX)②", "ticker": "", "amount": 279452, "price": 1}, {"id": 58, "type": "fund", "name": "SBI・V・先進国株式(除く米国)", "ticker": "", "amount": 350875, "price": 1}, {"id": 59, "type": "fund", "name": "SBI・iシェアーズ・ゴールドファンド", "ticker": "", "amount": 27815, "price": 1}, {"id": 60, "type": "fund", "name": "eMAXIS Slim 国内株式(日経平均)②", "ticker": "", "amount": 321353, "price": 1}, {"id": 61, "type": "fund", "name": "eMAXIS Slim 米国株式(S&P500)", "ticker": "", "amount": 488329, "price": 1}, {"id": 62, "type": "fund", "name": "eMAXIS Slim 国内株式(TOPIX)③", "ticker": "", "amount": 48102, "price": 1}, {"id": 71, "type": "fund", "name": "eMAXIS Slim 米国株式(S&P500) マネックス", "ticker": "", "amount": 36015, "price": 1}, {"id": 72, "type": "fund", "name": "ニッセイ日経平均インデックスファンド（年金）", "ticker": "", "amount": 1857637, "price": 1}, {"id": 73, "type": "fund", "name": "eMAXIS Slim 国内株式(TOPIX)（年金）", "ticker": "", "amount": 1629046, "price": 1}, {"id": 74, "type": "fund", "name": "eMAXIS Slim 米国株式(S&P500)（年金）", "ticker": "", "amount": 682095, "price": 1}], "wife": [{"id": 3, "type": "cash", "name": "プルメリア支店 普通預金", "ticker": "", "amount": 198, "price": 1}, {"id": 7, "type": "cash", "name": "代表口座 円普通", "ticker": "", "amount": 79050, "price": 1}, {"id": 8, "type": "cash", "name": "SBIハイブリッド預金", "ticker": "", "amount": 2641, "price": 1}, {"id": 9, "type": "cash", "name": "旅費 円普通", "ticker": "", "amount": 225107, "price": 1}, {"id": 10, "type": "cash", "name": "家火災保険 円普通", "ticker": "", "amount": 104230, "price": 1}, {"id": 11, "type": "cash", "name": "売電貯蓄 円普通", "ticker": "", "amount": 110122, "price": 1}, {"id": 12, "type": "cash", "name": "水道点検費用 円普通", "ticker": "", "amount": 28534, "price": 1}, {"id": 13, "type": "cash", "name": "マミ保険 円普通", "ticker": "", "amount": 10027, "price": 1}, {"id": 14, "type": "cash", "name": "こども投資口座 円普通", "ticker": "", "amount": 4002032, "price": 1}, {"id": 28, "type": "cash", "name": "円普通預金 ソニー銀行 真実", "ticker": "", "amount": 1002359, "price": 1}, {"id": 29, "type": "cash", "name": "一宮支店 普通 東海労金", "ticker": "", "amount": 319165, "price": 1}, {"id": 30, "type": "cash", "name": "中村支店 普通 北陸銀行", "ticker": "", "amount": 278086, "price": 1}, {"id": 32, "type": "cash", "name": "普通預金残高 三井住友 真実", "ticker": "", "amount": 485327, "price": 1}, {"id": 35, "type": "cash", "name": "円預金 楽天銀行 真実", "ticker": "", "amount": 15332, "price": 1}, {"id": 41, "type": "cash", "name": "米ドル 普通預金 イオン 真実", "ticker": "", "amount": 20128, "price": 1}, {"id": 42, "type": "cash", "name": "南アランド定期 SBI 真実", "ticker": "", "amount": 1224, "price": 1}, {"id": 63, "type": "fund", "name": "eMAXIS Slim 国内株式(日経平均) 真実", "ticker": "", "amount": 316635, "price": 1}, {"id": 64, "type": "fund", "name": "eMAXIS Slim 国内株式(TOPIX) 真実", "ticker": "", "amount": 279452, "price": 1}, {"id": 65, "type": "fund", "name": "SBI・V・先進国株式(除く米国) 真実", "ticker": "", "amount": 196711, "price": 1}, {"id": 66, "type": "fund", "name": "SBI・iシェアーズ・ゴールドファンド 真実", "ticker": "", "amount": 27815, "price": 1}, {"id": 67, "type": "fund", "name": "eMAXIS Slim 国内株式(日経平均)② 真実", "ticker": "", "amount": 434106, "price": 1}, {"id": 68, "type": "fund", "name": "eMAXIS Slim 米国株式(S&P500) 真実", "ticker": "", "amount": 439683, "price": 1}, {"id": 69, "type": "fund", "name": "eMAXIS Slim 国内株式(TOPIX)② 真実", "ticker": "", "amount": 293900, "price": 1}, {"id": 70, "type": "fund", "name": "eMAXIS Slim 先進国株式(除く日本) 真実", "ticker": "", "amount": 22008, "price": 1}], "daughter": [{"id": 23, "type": "cash", "name": "代表口座 円普通 未來", "ticker": "", "amount": 4, "price": 1}, {"id": 24, "type": "cash", "name": "教育資金 円普通 未來", "ticker": "", "amount": 67450, "price": 1}, {"id": 25, "type": "cash", "name": "教育資金 円定期 未來", "ticker": "", "amount": 760000, "price": 1}, {"id": 33, "type": "cash", "name": "二一八店 普通 ゆうちょ 実來", "ticker": "", "amount": 130666, "price": 1}, {"id": 36, "type": "cash", "name": "円預金 楽天銀行 実來", "ticker": "", "amount": 682, "price": 1}, {"id": 44, "type": "cash", "name": "現金残高 SBI証券 実來", "ticker": "", "amount": 49679, "price": 1}, {"id": 47, "type": "fund", "name": "eMAXIS Slim 国内株式(日経平均)", "ticker": "", "amount": 154304, "price": 1}, {"id": 48, "type": "fund", "name": "eMAXIS Slim 米国株式(S&P500)", "ticker": "", "amount": 288535, "price": 1}, {"id": 49, "type": "fund", "name": "eMAXIS Slim 国内株式(TOPIX)", "ticker": "", "amount": 132773, "price": 1}, {"id": 50, "type": "fund", "name": "SBI・V・先進国株式(除く米国)", "ticker": "", "amount": 95262, "price": 1}], "son": [{"id": 20, "type": "cash", "name": "代表口座 円普通 逞眞", "ticker": "", "amount": 14, "price": 1}, {"id": 21, "type": "cash", "name": "教育資金 円普通 逞眞", "ticker": "", "amount": 80556, "price": 1}, {"id": 22, "type": "cash", "name": "教育資金 円定期 逞眞", "ticker": "", "amount": 440000, "price": 1}, {"id": 45, "type": "cash", "name": "現金残高 SBI証券 逞眞", "ticker": "", "amount": 147855, "price": 1}, {"id": 51, "type": "fund", "name": "eMAXIS Slim 国内株式(日経平均)", "ticker": "", "amount": 150044, "price": 1}, {"id": 52, "type": "fund", "name": "eMAXIS Slim 米国株式(S&P500)", "ticker": "", "amount": 246811, "price": 1}, {"id": 53, "type": "fund", "name": "eMAXIS Slim 国内株式(TOPIX)", "ticker": "", "amount": 129149, "price": 1}, {"id": 54, "type": "fund", "name": "eMAXIS Slim 先進国株式(除く日本)", "ticker": "", "amount": 59799, "price": 1}]};
+</script>
+<script type="text/babel">
+const { useState, useRef, useEffect } = React;
+
+
+const MEMBERS = [
+  { id: "self", name: "自分", icon: "👤" },
+  { id: "wife", name: "妻", icon: "👩" },
+  { id: "daughter", name: "長女", icon: "👧" },
+  { id: "son", name: "長男", icon: "👦" },
+];
+
+const TYPE_LABELS = { stock: "株式・ETF", fund: "投資信託", cash: "現金・預金", gold: "金・金ETF", commodity: "コモディティ", reit: "REIT・不動産", other: "その他" };
+const TYPE_COLORS = { stock: "#C8A97E", fund: "#8BA888", cash: "#7E9EC8", gold: "#D4AF37", commodity: "#CD7F32", reit: "#7EC8B8", other: "#9E8EC8" };
+const TYPE_ICONS  = { stock: "📈", fund: "📊", cash: "🏦", gold: "🥇", commodity: "🛢️", reit: "🏢", other: "📦" };
+
+const GOLD_TICKERS = ["GLD","IAU","GLDM","SGOL","GDX","1328","1540","1672"];
+
+// 口座名からメンバーを自動判定
+function detectMember(institution) {
+  const s = institution || "";
+  if (s.includes("逞眞") || s.includes("たくま") || s.includes("タクマ")) return "son";
+  if (s.includes("未來") || s.includes("みく") || s.includes("ミク") || s.includes("実來")) return "daughter";
+  if (s.includes("真実") || s.includes("まみ") || s.includes("マミ")) return "wife";
+  return "self";
+}
+
+const INITIAL_DATA = window.REAL_DATA || {"self":[],"wife":[],"daughter":[],"son":[]};
+
+const BUILTIN_STOCKS = [
+  { name:"トヨタ自動車", nameJa:"トヨタ", ticker:"7203", type:"stock", market:"JP", note:"自動車" },
+  { name:"ソニーグループ", nameJa:"ソニー", ticker:"6758", type:"stock", market:"JP", note:"電機" },
+  { name:"三菱UFJフィナンシャル", nameJa:"三菱UFJ", ticker:"8306", type:"stock", market:"JP", note:"銀行" },
+  { name:"任天堂", nameJa:"任天堂", ticker:"7974", type:"stock", market:"JP", note:"ゲーム" },
+  { name:"ソフトバンクグループ", nameJa:"SBG", ticker:"9984", type:"stock", market:"JP", note:"IT投資" },
+  { name:"キーエンス", nameJa:"キーエンス", ticker:"6861", type:"stock", market:"JP", note:"計測機器" },
+  { name:"東京エレクトロン", nameJa:"東エレク", ticker:"8035", type:"stock", market:"JP", note:"半導体" },
+  { name:"ファーストリテイリング", nameJa:"ユニクロ", ticker:"9983", type:"stock", market:"JP", note:"アパレル" },
+  { name:"KDDI", nameJa:"KDDI", ticker:"9433", type:"stock", market:"JP", note:"通信" },
+  { name:"NTT", nameJa:"NTT", ticker:"9432", type:"stock", market:"JP", note:"通信" },
+  { name:"ホンダ", nameJa:"ホンダ", ticker:"7267", type:"stock", market:"JP", note:"自動車" },
+  { name:"三菱商事", nameJa:"三菱商事", ticker:"8058", type:"stock", market:"JP", note:"商社" },
+  { name:"Apple Inc.", nameJa:"アップル", ticker:"AAPL", type:"stock", market:"US", note:"IT" },
+  { name:"Microsoft", nameJa:"マイクロソフト", ticker:"MSFT", type:"stock", market:"US", note:"IT" },
+  { name:"NVIDIA", nameJa:"エヌビディア", ticker:"NVDA", type:"stock", market:"US", note:"半導体" },
+  { name:"Amazon", nameJa:"アマゾン", ticker:"AMZN", type:"stock", market:"US", note:"EC" },
+  { name:"Alphabet", nameJa:"グーグル", ticker:"GOOGL", type:"stock", market:"US", note:"検索" },
+  { name:"Meta", nameJa:"メタ", ticker:"META", type:"stock", market:"US", note:"SNS" },
+  { name:"Tesla", nameJa:"テスラ", ticker:"TSLA", type:"stock", market:"US", note:"EV" },
+  { name:"Vanguard S&P500 ETF", nameJa:"VOO", ticker:"VOO", type:"etf", market:"US", note:"S&P500" },
+  { name:"iShares S&P500 ETF", nameJa:"IVV", ticker:"IVV", type:"etf", market:"US", note:"S&P500" },
+  { name:"SPDR S&P500 ETF", nameJa:"SPY", ticker:"SPY", type:"etf", market:"US", note:"S&P500" },
+  { name:"Invesco QQQ", nameJa:"QQQ", ticker:"QQQ", type:"etf", market:"US", note:"NASDAQ100" },
+  { name:"Vanguard Total World ETF", nameJa:"VT", ticker:"VT", type:"etf", market:"US", note:"全世界株" },
+  { name:"Vanguard Total Stock Market ETF", nameJa:"VTI", ticker:"VTI", type:"etf", market:"US", note:"全米株" },
+  { name:"eMAXIS Slim 全世界株式(オール・カントリー)", nameJa:"オルカン", ticker:"0331418A", type:"fund", market:"JP", note:"全世界株インデックス" },
+  { name:"eMAXIS Slim 米国株式(S&P500)", nameJa:"eMAXIS S&P500", ticker:"03311187", type:"fund", market:"JP", note:"S&P500連動" },
+  { name:"eMAXIS Slim 国内株式(TOPIX)", nameJa:"eMAXIS TOPIX", ticker:"03311179", type:"fund", market:"JP", note:"TOPIX連動" },
+  { name:"eMAXIS Slim 先進国株式", nameJa:"eMAXIS 先進国", ticker:"03311195", type:"fund", market:"JP", note:"先進国株" },
+  { name:"eMAXIS Slim バランス(8資産均等型)", nameJa:"eMAXIS バランス", ticker:"03311211", type:"fund", market:"JP", note:"8資産均等" },
+  { name:"eMAXIS Goldインデックス", nameJa:"eMAXIS Gold", ticker:"03311971", type:"gold", market:"JP", note:"金インデックス" },
+  { name:"SBI・V・S&P500", nameJa:"SBI V S&P500", ticker:"89311199", type:"fund", market:"JP", note:"S&P500連動" },
+  { name:"楽天・全米株式インデックス", nameJa:"楽天VTI", ticker:"9I312179", type:"fund", market:"JP", note:"全米株連動" },
+  { name:"楽天・全世界株式インデックス", nameJa:"楽天VT", ticker:"9I311188", type:"fund", market:"JP", note:"全世界株連動" },
+  { name:"SPDR Gold Shares", nameJa:"金ETF GLD", ticker:"GLD", type:"gold", market:"US", note:"金ETF" },
+  { name:"iShares Gold Trust", nameJa:"金ETF IAU", ticker:"IAU", type:"gold", market:"US", note:"金ETF" },
+  { name:"SPDR Gold MiniShares", nameJa:"金ETF GLDM", ticker:"GLDM", type:"gold", market:"US", note:"金ETF" },
+  { name:"VanEck Gold Miners ETF", nameJa:"金鉱株 GDX", ticker:"GDX", type:"gold", market:"US", note:"金鉱株ETF" },
+  { name:"NEXT FUNDS 金価格連動型", nameJa:"金ETF 1328", ticker:"1328", type:"gold", market:"JP", note:"国内金ETF" },
+  { name:"純金上場信託", nameJa:"純金ETF 1540", ticker:"1540", type:"gold", market:"JP", note:"国内金ETF" },
+  { name:"WisdomTree 金上場投資信託", nameJa:"金ETF 1672", ticker:"1672", type:"gold", market:"JP", note:"国内金ETF" },
+  { name:"iシェアーズ ゴールドインデックスファンド", nameJa:"iシェアーズ金", ticker:"03311989", type:"gold", market:"JP", note:"金投資信託" },
+  { name:"ピクテ・ゴールド(ヘッジあり)", nameJa:"ピクテ金", ticker:"9231119C", type:"gold", market:"JP", note:"金投資信託" },
+  { name:"ピクテ・ゴールド(ヘッジなし)", nameJa:"ピクテ金(H無)", ticker:"9231119B", type:"gold", market:"JP", note:"金投資信託" },
+  { name:"Vanguard Real Estate ETF", nameJa:"REIT VNQ", ticker:"VNQ", type:"reit", market:"US", note:"米国REIT" },
+  { name:"NEXT FUNDS 東証REIT指数ETF", nameJa:"J-REIT 1343", ticker:"1343", type:"reit", market:"JP", note:"国内J-REIT" },
+  { name:"United States Oil Fund", nameJa:"原油ETF USO", ticker:"USO", type:"commodity", market:"US", note:"原油ETF" },
+  { name:"iShares Silver Trust", nameJa:"銀ETF SLV", ticker:"SLV", type:"commodity", market:"US", note:"銀ETF" },
+];
+
+function searchBuiltin(q) {
+  if (!q) return [];
+  const kw = q.toLowerCase();
+  return BUILTIN_STOCKS.filter(s =>
+    s.name.toLowerCase().includes(kw) ||
+    (s.nameJa && s.nameJa.toLowerCase().includes(kw)) ||
+    s.ticker.toLowerCase().includes(kw) ||
+    s.note.toLowerCase().includes(kw)
+  ).slice(0, 8);
+}
+
+function formatJPY(n) {
+  n = Number(n) || 0;
+  if (n >= 100000000) return `${(n/100000000).toFixed(2)}億円`;
+  if (n >= 10000) return `${(n/10000).toFixed(1)}万円`;
+  return `${Math.round(n).toLocaleString()}円`;
+}
+
+function toYahooSymbol(ticker, type) {
+  if (!ticker || type === "cash") return null;
+  const t = ticker.trim();
+  if (/^\d{4,5}$/.test(t)) return t + ".T";
+  if (/^\d{8,}/.test(t)) return null;
+  return t.toUpperCase();
+}
+
+async function fetchPrice(symbol) {
+  try {
+    const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1d`);
+    const data = await res.json();
+    const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+    const currency = data?.chart?.result?.[0]?.meta?.currency;
+    return { price, currency };
+  } catch { return null; }
+}
+
+function detectType(name, ticker) {
+  const n = name || ""; const t = ticker || "";
+  if (GOLD_TICKERS.includes(t.toUpperCase()) || (n.includes("金") && (n.includes("ETF") || n.includes("ゴールド") || n.includes("Gold") || n.includes("投資信託") || n.includes("ファンド")))) return "gold";
+  if (n.includes("REIT") || n.includes("リート") || n.includes("不動産")) return "reit";
+  if (n.includes("原油") || n.includes("銀") || t === "SLV" || t === "USO") return "commodity";
+  if (n.includes("スリム") || n.includes("ファンド") || n.includes("Fund") || n.includes("投資信託")) return "fund";
+  return "stock";
+}
+
+// CSVパーサー
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) return [];
+  if (lines[0].charCodeAt(0) === 0xFEFF) lines[0] = lines[0].slice(1);
+  const header = lines[0].split(",").map(h => h.replace(/"/g,"").trim());
+  const results = [];
+  const isMFAcc   = header.some(h => h.includes("金融機関") || h.includes("残高"));
+  const isMonexF  = header.some(h => h.includes("ファンド名称") || h.includes("保有口数"));
+  const isMonex   = header.some(h => h.includes("銘柄名称") || h.includes("概算評価額"));
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(",");
+    const row = cols.map(c => c.replace(/^"|"$/g,"").trim());
+    if (row.every(c => !c)) continue;
+    const get = (...keys) => { for (const k of keys) { const idx = header.findIndex(h => h.includes(k)); if (idx >= 0 && row[idx]) return row[idx].replace(/,/g,""); } return ""; };
+    const num = s => parseFloat(s.replace(/[^0-9.-]/g,"")) || 0;
+    if (isMonexF) {
+      const name = get("ファンド名称","ファンド名"); if (!name) continue;
+      const amount = num(get("保有口数")); const priceStr = get("基準価額"); const totalStr = get("概算評価額","評価額");
+      const price = num(priceStr) || (totalStr ? num(totalStr) / (amount||1) : 0);
+      results.push({ id: Date.now()+i, type:"fund", name, ticker: get("ファンドコード","コード"), amount: amount||1, price });
+    } else if (isMonex) {
+      const name = get("銘柄名称","銘柄名"); if (!name) continue;
+      const ticker = get("銘柄コード","ティッカー","コード");
+      const amount = num(get("保有株数","保有数量")); const priceStr = get("現在値","参考取得単価"); const totalStr = get("概算評価額","評価額");
+      const price = num(priceStr) || (totalStr ? num(totalStr) / (amount||1) : 0);
+      results.push({ id: Date.now()+i, type: detectType(name, ticker), name, ticker, amount: amount||1, price });
+    } else if (isMFAcc) {
+      const name = get("口座名","金融機関","名称"); const totalStr = get("残高","金額","評価額");
+      if (!name || !totalStr) continue;
+      results.push({ id: Date.now()+i, type:"cash", name, ticker:"", amount: num(totalStr), price:1 });
+    } else {
+      const name = get("銘柄名","銘柄","ファンド名"); if (!name) continue;
+      const ticker = get("コード","銘柄コード","ティッカー");
+      const amount = num(get("保有数","保有口数","数量","保有株数")); const priceStr = get("現在値","基準価額","評価単価"); const totalStr = get("評価額","時価評価額","評価金額");
+      const price = num(priceStr) || (totalStr ? num(totalStr) / (amount||1) : 0);
+      results.push({ id: Date.now()+i, type: detectType(name, ticker), name, ticker, amount: amount||1, price });
+    }
+  }
+  return results;
+}
+
+// ドーナツチャート
+function DonutChart({ data, total }) {
+  const size=180, r=65, cx=size/2, cy=size/2;
+  let cum = -Math.PI/2;
+  const slices = data.filter(d => d.value > 0).map(d => {
+    const angle = (d.value/total)*2*Math.PI;
+    const x1=cx+r*Math.cos(cum), y1=cy+r*Math.sin(cum);
+    cum += angle;
+    const x2=cx+r*Math.cos(cum), y2=cy+r*Math.sin(cum);
+    return { ...d, path:`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${angle>Math.PI?1:0} 1 ${x2} ${y2} Z` };
+  });
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {slices.map((s,i) => <path key={i} d={s.path} fill={s.color} opacity="0.88" stroke="#1a1a1a" strokeWidth="2"/>)}
+      <circle cx={cx} cy={cy} r={r*0.52} fill="#1a1a1a"/>
+      <text x={cx} y={cy-5} textAnchor="middle" fill="#C8A97E" fontSize="10" fontFamily="'Noto Serif JP',serif">総資産</text>
+      <text x={cx} y={cy+10} textAnchor="middle" fill="#f0ead6" fontSize="8" fontFamily="'Noto Serif JP',serif">{formatJPY(total)}</text>
+    </svg>
+  );
+}
+
+// 銘柄サジェスト
+function TickerSearch({ form, setForm, inputStyle }) {
+  const [query, setQuery]   = useState(form.name || "");
+  const [suggs, setSuggs]   = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [error, setError]   = useState("");
+  const [show, setShow]     = useState(false);
+  const debRef  = useRef(null);
+  const contRef = useRef(null);
+
+  useEffect(() => {
+    const fn = e => { if (contRef.current && !contRef.current.contains(e.target)) setShow(false); };
+    document.addEventListener("mousedown", fn);
+    return () => document.removeEventListener("mousedown", fn);
+  }, []);
+
+  async function searchAI(q) {
+    setSearching(true); setError("");
+    const prompt = `「${q}」に部分一致する株式・ETF・投資信託・金ETF・REITの候補を最大5件、JSONのみで返せ。
+[{"name":"正式名称","nameJa":"日本語名","ticker":"コード","type":"stock|fund|etf|gold|reit|commodity","market":"JP|US","note":"一言"}]
+- 日本株ticker=4桁数字、米国株=ティッカー、投資信託=fund、金関連=gold
+- 必ずJSON配列を完結させること。説明文不要。`;
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:2000, messages:[{role:"user",content:prompt}] })
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message);
+      const text = data.content?.[0]?.text || "[]";
+      const startIdx = text.indexOf("[");
+      let clean = startIdx >= 0 ? text.slice(startIdx) : text;
+      let parsed = [];
+      try { parsed = JSON.parse(clean); }
+      catch { const ms = clean.match(/\{[^{}]*\}/g)||[]; parsed = ms.map(m => { try{return JSON.parse(m);}catch{return null;} }).filter(Boolean); }
+      setSuggs(prev => {
+        const existing = prev.map(p => p.ticker);
+        const newOnes = parsed.filter(p => !existing.includes(p.ticker));
+        return [...prev, ...newOnes].slice(0,8);
+      });
+      setShow(true);
+    } catch(e) { setError("AI検索エラー: "+e.message); }
+    setSearching(false);
+  }
+
+  function handleInput(val) {
+    setQuery(val); setForm({...form, name:val});
+    clearTimeout(debRef.current);
+    if (!val.trim()) { setSuggs([]); setShow(false); return; }
+    const builtin = searchBuiltin(val);
+    setSuggs(builtin); setShow(builtin.length > 0);
+    if (builtin.length < 3) debRef.current = setTimeout(() => searchAI(val), 800);
+  }
+
+  function select(s) {
+    const name = s.nameJa || s.name;
+    let t = s.type === "etf" ? "stock" : s.type;
+    if (!TYPE_LABELS[t]) t = "stock";
+    setQuery(name); setForm({...form, name, ticker:s.ticker, type:t});
+    setShow(false);
+  }
+
+  return (
+    <div ref={contRef} style={{position:"relative"}}>
+      <div style={{position:"relative"}}>
+        <input style={{...inputStyle, paddingRight:32}}
+          placeholder="銘柄名 or ティッカー（例: トヨタ, AAPL, 金ETF）"
+          value={query} onChange={e => handleInput(e.target.value)}
+          onFocus={() => suggs.length > 0 && setShow(true)} />
+        <span style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",fontSize:12,color:"#5a5040"}}>{searching?"⏳":"🔍"}</span>
+      </div>
+      {error && <div style={{fontSize:11,color:"#c87e7e",padding:"4px 8px",background:"#2a1414",borderRadius:6,marginTop:2}}>{error}</div>}
+      {show && suggs.length > 0 && (
+        <div style={{position:"absolute",top:"100%",left:0,right:0,zIndex:300,background:"#1a1a1a",border:"1px solid #C8A97E44",borderRadius:8,overflow:"hidden",marginTop:2,boxShadow:"0 8px 24px #00000099"}}>
+          {suggs.map((s,i) => (
+            <div key={i} onMouseDown={()=>select(s)} onTouchEnd={()=>select(s)}
+              style={{display:"flex",alignItems:"center",gap:10,padding:"9px 14px",cursor:"pointer",borderBottom:i<suggs.length-1?"1px solid #2e2a22":"none"}}
+              onMouseEnter={e=>e.currentTarget.style.background="#C8A97E11"}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+              <span>{s.market==="JP"?"🇯🇵":"🇺🇸"}</span>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:12,color:"#d4c9b0",fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.nameJa||s.name}</div>
+                <div style={{fontSize:10,color:"#5a5040"}}>{s.ticker} · {TYPE_LABELS[s.type==="etf"?"stock":s.type]||s.type} · {s.note}</div>
+              </div>
+              <span style={{fontSize:11,color:"#C8A97E",background:"#C8A97E11",padding:"2px 6px",borderRadius:4,flexShrink:0}}>{s.ticker}</span>
+            </div>
+          ))}
+          <div style={{padding:"5px 14px",fontSize:10,color:"#3a3028",borderTop:"1px solid #2e2a22"}}>🤖 AI候補含む</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// CSV取込モーダル
+function CSVModal({ memberName, onImport, onClose, autoAssign }) {
+  const [preview, setPreview] = useState(null);
+  const [mode, setMode] = useState("append");
+  const [drag, setDrag] = useState(false);
+  const [err, setErr] = useState("");
+  const [autoData, setAutoData] = useState(null);
+  const fileRef = useRef();
+  const MEMBER_LABELS = { self:"自分", wife:"妻", daughter:"長女", son:"長男" };
+  const MEMBER_COLORS = { self:"#C8A97E", wife:"#8BA888", daughter:"#7EC8B8", son:"#7E9EC8" };
+
+  function handleFile(f) {
+    setErr("");
+    const reader = new FileReader();
+    reader.onload = e => {
+      const text = e.target.result;
+      if (autoAssign) {
+        // 自動振り分けモード
+        const lines = text.trim().split(/\r?\n/);
+        if (lines.length < 2) { setErr("読み取れませんでした"); return; }
+        if (lines[0].charCodeAt(0) === 0xFEFF) lines[0] = lines[0].slice(1);
+        const header = lines[0].split(",").map(h => h.replace(/"/g,"").trim());
+        const instIdx = header.findIndex(h => h.includes("保有金融機関") || h.includes("金融機関"));
+        const amtIdx = header.findIndex(h => h.includes("残高") || h.includes("金額") || h.includes("評価額"));
+        const nameIdx = header.findIndex(h => h.includes("内容") || h.includes("口座名") || h.includes("銘柄"));
+        const byMember = { self:[], wife:[], daughter:[], son:[] };
+        for (let i = 1; i < lines.length; i++) {
+          const row = lines[i].split(",").map(c => c.replace(/^"|"$/g,"").trim());
+          if (row.every(c=>!c)) continue;
+          const institution = instIdx>=0 ? row[instIdx] : "";
+          const name = institution || (nameIdx>=0 ? row[nameIdx] : "");
+          const amtStr = amtIdx>=0 ? row[amtIdx] : "";
+          const amount = Math.abs(parseFloat(amtStr.replace(/[^0-9.-]/g,""))||0);
+          if (!name || !amount) continue;
+          const memberId = detectMember(institution);
+          byMember[memberId].push({ id: Date.now()+i, type:"cash", name, ticker:"", amount, price:1 });
+        }
+        const total = Object.values(byMember).reduce((s,arr)=>s+arr.length,0);
+        if (!total) { setErr("データを読み取れませんでした"); return; }
+        setAutoData(byMember);
+        setPreview("auto");
+      } else {
+        const parsed = parseCSV(text);
+        if (!parsed.length) { setErr("読み取れませんでした"); return; }
+        setPreview(parsed);
+      }
+    };
+    reader.readAsText(f, "utf-8");
+  }
+
+  const iStyle = {position:"fixed",inset:0,background:"#000c",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:16};
+  const mStyle = {background:"#141414",border:"1px solid #2e2a22",borderRadius:16,padding:24,width:"100%",maxWidth:480,maxHeight:"80vh",overflowY:"auto"};
+  return (
+    <div style={iStyle} onClick={onClose}>
+      <div style={mStyle} onClick={e=>e.stopPropagation()}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+          <div style={{fontSize:14,color:"#C8A97E",fontWeight:700}}>
+            {autoAssign ? "📂 一括CSV読込（自動振り分け）" : `📂 CSV読込 — ${memberName}`}
+          </div>
+          <button onClick={onClose} style={{background:"transparent",border:"none",color:"#5a5040",fontSize:20,cursor:"pointer"}}>×</button>
+        </div>
+        {autoAssign && !preview && (
+          <div style={{background:"#0d0d0d",borderRadius:8,padding:10,marginBottom:12,fontSize:11,color:"#8a7a60",lineHeight:1.9}}>
+            口座名で自動振り分けします：<br/>
+            <span style={{color:"#8BA888"}}>真実</span> → 妻　
+            <span style={{color:"#7EC8B8"}}>逞眞</span> → 長男　
+            <span style={{color:"#7E9EC8"}}>未來・実來</span> → 長女　
+            それ以外 → 自分
+          </div>
+        )}
+        {!preview ? (
+          <label style={{display:"block",cursor:"pointer"}}>
+            <div onDragOver={e=>{e.preventDefault();setDrag(true)}} onDragLeave={()=>setDrag(false)}
+              onDrop={e=>{e.preventDefault();setDrag(false);handleFile(e.dataTransfer.files[0]);}}
+              style={{border:`2px dashed ${drag?"#C8A97E":"#2e2a22"}`,borderRadius:12,padding:"32px 20px",textAlign:"center",background:drag?"#C8A97E11":"#0d0d0d",marginBottom:10}}>
+              <div style={{fontSize:28,marginBottom:8}}>📄</div>
+              <div style={{color:"#8a7a60",fontSize:12}}>CSVをドロップ or 下のボタンから選択</div>
+            </div>
+            <div style={{background:"linear-gradient(135deg,#C8A97E,#a8855a)",borderRadius:8,padding:"12px",textAlign:"center",color:"#1a1a1a",fontFamily:"'Noto Serif JP',serif",fontSize:13,fontWeight:700}}>
+              📁 ファイルを選択
+            </div>
+            <input type="file" accept=".csv" style={{display:"none"}} onChange={e=>e.target.files[0]&&handleFile(e.target.files[0])}/>
+          </label>
+        ) : preview === "auto" ? (
+          <div>
+            <div style={{fontSize:12,color:"#8BA888",marginBottom:10}}>✅ 自動振り分け結果</div>
+            <div style={{background:"#0d0d0d",borderRadius:8,padding:10,maxHeight:220,overflowY:"auto",marginBottom:10}}>
+              {Object.entries(autoData).map(([memberId, assets]) => assets.length > 0 && (
+                <div key={memberId} style={{marginBottom:10}}>
+                  <div style={{fontSize:12,color:MEMBER_COLORS[memberId],fontWeight:600,marginBottom:4}}>
+                    {MEMBER_LABELS[memberId]}（{assets.length}件）
+                  </div>
+                  {assets.map((a,i)=>(
+                    <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"4px 8px",fontSize:11,color:"#a09070"}}>
+                      <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"65%"}}>{a.name}</span>
+                      <span style={{color:MEMBER_COLORS[memberId]}}>{formatJPY(a.amount)}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div style={{display:"flex",gap:8,marginBottom:10}}>
+              {[["append","追加"],["replace","置換"]].map(([v,l])=>(
+                <button key={v} onClick={()=>setMode(v)} style={{flex:1,background:mode===v?"#C8A97E22":"transparent",border:`1px solid ${mode===v?"#C8A97E":"#2e2a22"}`,borderRadius:8,color:mode===v?"#C8A97E":"#5a5040",padding:8,fontFamily:"'Noto Serif JP',serif",fontSize:12,cursor:"pointer"}}>{l}</button>
+              ))}
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <button onClick={()=>{setPreview(null);setAutoData(null);}} style={{flex:1,background:"transparent",border:"1px solid #2e2a22",borderRadius:8,color:"#5a5040",padding:9,fontFamily:"'Noto Serif JP',serif",fontSize:12,cursor:"pointer"}}>やり直す</button>
+              <button onClick={()=>{onImport(autoData,mode,true);onClose();}} style={{flex:2,background:"linear-gradient(135deg,#C8A97E,#a8855a)",border:"none",borderRadius:8,color:"#1a1a1a",padding:9,fontFamily:"'Noto Serif JP',serif",fontSize:12,cursor:"pointer",fontWeight:700}}>振り分けてインポート</button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <div style={{fontSize:12,color:"#8BA888",marginBottom:10}}>✅ {preview.length}件を読み取り</div>
+            <div style={{background:"#0d0d0d",borderRadius:8,padding:10,maxHeight:180,overflowY:"auto",marginBottom:10}}>
+              {preview.map((a,i)=>(
+                <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:"1px solid #1e1a14",fontSize:11}}>
+                  <span style={{color:"#d4c9b0"}}>{TYPE_ICONS[a.type]} {a.name}</span>
+                  <span style={{color:"#C8A97E"}}>{formatJPY(a.amount*a.price)}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{display:"flex",gap:8,marginBottom:10}}>
+              {[["append","追加"],["replace","置換"]].map(([v,l])=>(
+                <button key={v} onClick={()=>setMode(v)} style={{flex:1,background:mode===v?"#C8A97E22":"transparent",border:`1px solid ${mode===v?"#C8A97E":"#2e2a22"}`,borderRadius:8,color:mode===v?"#C8A97E":"#5a5040",padding:8,fontFamily:"'Noto Serif JP',serif",fontSize:12,cursor:"pointer"}}>{l}</button>
+              ))}
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <button onClick={()=>setPreview(null)} style={{flex:1,background:"transparent",border:"1px solid #2e2a22",borderRadius:8,color:"#5a5040",padding:9,fontFamily:"'Noto Serif JP',serif",fontSize:12,cursor:"pointer"}}>やり直す</button>
+              <button onClick={()=>{onImport(preview,mode);onClose();}} style={{flex:2,background:"linear-gradient(135deg,#C8A97E,#a8855a)",border:"none",borderRadius:8,color:"#1a1a1a",padding:9,fontFamily:"'Noto Serif JP',serif",fontSize:12,cursor:"pointer",fontWeight:700}}>インポート</button>
+            </div>
+          </div>
+        )}
+        {err && <div style={{marginTop:10,color:"#c87e7e",fontSize:11,background:"#2a1414",borderRadius:8,padding:8}}>{err}</div>}
+      </div>
+    </div>
+  );
+}
+
+// AI分析
+function AIAnalysis({ assets, memberName }) {
+  const [text, setText] = useState(""); const [loading, setLoading] = useState(false); const [done, setDone] = useState(false);
+  const total = assets.reduce((s,a)=>s+a.amount*a.price,0);
+  const byType = {}; assets.forEach(a=>{byType[a.type]=(byType[a.type]||0)+a.amount*a.price;});
+  const breakdown = Object.entries(byType).map(([t,v])=>`${TYPE_LABELS[t]}:${((v/total)*100).toFixed(1)}%`).join("、");
+  async function run() {
+    setLoading(true); setText(""); setDone(false);
+    const prompt = `${memberName}さんのポートフォリオを分析してアドバイスしてください。\n総資産:${formatJPY(total)}\n配分:${breakdown}\n保有:${assets.map(a=>`${a.name}(${formatJPY(a.amount*a.price)})`).join("、")}\n\n1.強みと課題 2.リスク評価 3.改善提案\n※参考情報です`;
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,stream:true,messages:[{role:"user",content:prompt}]})});
+      const reader=res.body.getReader(); const dec=new TextDecoder(); let buf="";
+      while(true){const{done:d,value}=await reader.read();if(d)break;buf+=dec.decode(value,{stream:true});const lines=buf.split("\n");buf=lines.pop();for(const l of lines){if(l.startsWith("data: ")){try{const ev=JSON.parse(l.slice(6));if(ev.type==="content_block_delta"&&ev.delta?.text)setText(p=>p+ev.delta.text);}catch{}}}}
+      setDone(true);
+    } catch { setText("エラーが発生しました。"); }
+    setLoading(false);
+  }
+  return (
+    <div style={{background:"#141414",border:"1px solid #2e2a22",borderRadius:12,padding:20}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+        <div style={{fontSize:14,color:"#C8A97E",fontWeight:600}}>🤖 AI分析</div>
+        <button onClick={run} disabled={loading} style={{background:loading?"#2a2a2a":"linear-gradient(135deg,#C8A97E,#a8855a)",color:loading?"#666":"#1a1a1a",border:"none",borderRadius:8,padding:"7px 16px",fontFamily:"'Noto Serif JP',serif",fontSize:12,cursor:loading?"not-allowed":"pointer",fontWeight:700}}>{loading?"分析中...":done?"再分析":"AIに分析させる"}</button>
+      </div>
+      {!text&&!loading&&<p style={{color:"#3a3028",fontSize:13,textAlign:"center",padding:"24px 0"}}>ボタンを押してAI分析を開始</p>}
+      {(text||loading)&&<div style={{color:"#d4c9b0",fontSize:13,lineHeight:1.85,whiteSpace:"pre-wrap",background:"#0d0d0d",borderRadius:8,padding:14}}>{text}{loading&&<span style={{color:"#C8A97E"}}>▌</span>}</div>}
+      <p style={{color:"#3a3028",fontSize:11,marginTop:8}}>※本分析は参考情報です。</p>
+    </div>
+  );
+}
+
+// 同期パネル
+function SyncPanel({ onClose }) {
+  return (
+    <div style={{position:"fixed",inset:0,background:"#000c",zIndex:300,display:"flex",alignItems:"flex-end"}} onClick={onClose}>
+      <div style={{background:"#141414",border:"1px solid #2e2a22",borderRadius:"16px 16px 0 0",padding:24,width:"100%",maxWidth:800,margin:"0 auto"}} onClick={e=>e.stopPropagation()}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+          <div style={{fontSize:14,color:"#C8A97E",fontWeight:700}}>💾 データ保存について</div>
+          <button onClick={onClose} style={{background:"transparent",border:"none",color:"#5a5040",fontSize:22,cursor:"pointer"}}>×</button>
+        </div>
+        <div style={{background:"#0d0d0d",borderRadius:10,padding:16,marginBottom:12}}>
+          <div style={{fontSize:13,color:"#8BA888",marginBottom:6,fontWeight:600}}>✅ 自動保存中</div>
+          <div style={{fontSize:12,color:"#5a5040",lineHeight:1.9}}>
+            データはClaudeのストレージに自動保存されています。<br/>
+            Claudeにログインしていれば、スマホ・パソコンどちらからでも同じデータが使えます。
+          </div>
+        </div>
+        <div style={{fontSize:11,color:"#3a3028",textAlign:"center",lineHeight:1.8}}>
+          ページを閉じても、別の端末で開いても<br/>データは自動的に反映されます
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// メンバー個別ビュー
+function MemberView({ member, assets, setAssets }) {
+  const [sub, setSub] = useState("list");
+  const [showAdd, setShowAdd] = useState(false);
+  const [showCSV, setShowCSV] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [form, setForm] = useState({type:"stock",name:"",ticker:"",amount:"",price:""});
+  const [updating, setUpdating] = useState(false);
+  const [upStatus, setUpStatus] = useState("");
+  const [usdJpy, setUsdJpy] = useState(150);
+
+  const total = assets.reduce((s,a)=>s+a.amount*a.price,0);
+  const byType={}; assets.forEach(a=>{byType[a.type]=(byType[a.type]||0)+a.amount*a.price;});
+  const donut = Object.entries(byType).map(([t,v])=>({label:TYPE_LABELS[t],value:v,color:TYPE_COLORS[t]}));
+  const is = {background:"#0d0d0d",border:"1px solid #2e2a22",borderRadius:8,color:"#d4c9b0",fontFamily:"'Noto Serif JP',serif",fontSize:13,padding:"8px 12px",width:"100%",boxSizing:"border-box",outline:"none"};
+  const subBtn = (v,l) => <button onClick={()=>setSub(v)} style={{background:sub===v?"#C8A97E22":"transparent",color:sub===v?"#C8A97E":"#5a5040",border:sub===v?"1px solid #C8A97E44":"1px solid transparent",borderRadius:6,padding:"6px 12px",fontFamily:"'Noto Serif JP',serif",fontSize:12,cursor:"pointer"}}>{l}</button>;
+
+  async function updatePrices() {
+    setUpdating(true); setUpStatus("為替取得中...");
+    let rate=usdJpy;
+    try{const r=await fetchPrice("USDJPY=X");if(r?.price){rate=r.price;setUsdJpy(rate);}}catch{}
+    const upd=assets.filter(a=>toYahooSymbol(a.ticker,a.type));
+    if(!upd.length){setUpStatus("⚠️ ティッカー未設定");setUpdating(false);setTimeout(()=>setUpStatus(""),3000);return;}
+    let ok=0,ng=0; const na=[...assets];
+    for(let i=0;i<upd.length;i++){
+      const a=upd[i]; setUpStatus(`取得中 ${i+1}/${upd.length} (${a.name})`);
+      const sym=toYahooSymbol(a.ticker,a.type); const r=await fetchPrice(sym);
+      if(r?.price){let p=r.price;if(r.currency==="USD")p=Math.round(p*rate);const idx=na.findIndex(x=>x.id===a.id);if(idx>=0)na[idx]={...na[idx],price:p};ok++;}else ng++;
+      await new Promise(r=>setTimeout(r,300));
+    }
+    setAssets(na);
+    const t=new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
+    setUpStatus(`✅ ${ok}件更新${ng>0?` / ${ng}件失敗`:""} (${t} / ¥${rate.toFixed(1)}/USD)`);
+    setUpdating(false); setTimeout(()=>setUpStatus(""),5000);
+  }
+
+  function save() {
+    if(!form.name||!form.amount||!form.price) return;
+    if(editId!==null) setAssets(assets.map(a=>a.id===editId?{...a,...form,amount:Number(form.amount),price:Number(form.price)}:a));
+    else setAssets([...assets,{id:Date.now(),...form,amount:Number(form.amount),price:Number(form.price)}]);
+    setEditId(null); setForm({type:"stock",name:"",ticker:"",amount:"",price:""}); setShowAdd(false);
+  }
+
+  return (
+    <div>
+      {showCSV && <CSVModal memberName={member.name} onImport={(p,m)=>setAssets(m==="replace"?p:[...assets,...p])} onClose={()=>setShowCSV(false)}/>}
+      <div style={{background:"#141414",border:"1px solid #2e2a22",borderRadius:12,padding:16,marginBottom:14,display:"flex",alignItems:"center",gap:14}}>
+        <div style={{fontSize:36}}>{member.icon}</div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:16,fontWeight:700,color:"#f0ead6"}}>{member.name}</div>
+          <div style={{fontSize:20,fontWeight:700,color:"#C8A97E",marginTop:2}}>{formatJPY(total)}</div>
+        </div>
+        <DonutChart data={donut} total={total}/>
+      </div>
+      <div style={{display:"flex",gap:6,marginBottom:14}}>
+        {subBtn("list","💼 資産一覧")}{subBtn("analysis","🤖 AI分析")}
+      </div>
+      {sub==="list" && (
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          <div style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}>
+            <button onClick={updatePrices} disabled={updating} style={{background:"transparent",border:"1px solid #8BA88855",borderRadius:8,color:"#8BA888",padding:"8px 14px",fontFamily:"'Noto Serif JP',serif",fontSize:12,cursor:updating?"not-allowed":"pointer"}}>{updating?"⏳ 取得中...":"🔄 価格更新"}</button>
+            <button onClick={()=>setShowCSV(true)} style={{background:"transparent",border:"1px solid #C8A97E55",borderRadius:8,color:"#C8A97E",padding:"8px 14px",fontFamily:"'Noto Serif JP',serif",fontSize:12,cursor:"pointer"}}>📂 CSV読込</button>
+            <button onClick={()=>{setShowAdd(true);setEditId(null);setForm({type:"stock",name:"",ticker:"",amount:"",price:""}); }} style={{background:"linear-gradient(135deg,#C8A97E,#a8855a)",color:"#1a1a1a",border:"none",borderRadius:8,padding:"8px 16px",fontFamily:"'Noto Serif JP',serif",fontSize:12,cursor:"pointer",fontWeight:700}}>＋ 追加</button>
+          </div>
+          {upStatus&&<div style={{fontSize:11,color:upStatus.startsWith("✅")?"#8BA888":upStatus.startsWith("⚠️")?"#C8A97E":"#7E9EC8",background:"#0d0d0d",borderRadius:8,padding:"7px 12px",textAlign:"center"}}>{upStatus}</div>}
+          {showAdd && (
+            <div style={{background:"#141414",border:"1px solid #C8A97E44",borderRadius:12,padding:18,display:"flex",flexDirection:"column",gap:10}}>
+              <div style={{fontSize:13,color:"#C8A97E",fontWeight:600}}>{editId!==null?"編集":"資産を追加"}</div>
+              <select style={is} value={form.type} onChange={e=>setForm({...form,type:e.target.value})}>
+                {Object.entries(TYPE_LABELS).map(([v,l])=><option key={v} value={v}>{l}</option>)}
+              </select>
+              <TickerSearch form={form} setForm={setForm} inputStyle={is}/>
+              {form.ticker&&<div style={{fontSize:11,color:"#5a5040",padding:"2px 4px"}}>ティッカー: <span style={{color:"#C8A97E"}}>{form.ticker}</span></div>}
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                <input style={is} placeholder="数量 / 金額" type="number" value={form.amount} onChange={e=>setForm({...form,amount:e.target.value})}/>
+                <input style={is} placeholder="単価（円）" type="number" value={form.price} onChange={e=>setForm({...form,price:e.target.value})}/>
+              </div>
+              <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
+                <button onClick={()=>{setShowAdd(false);setEditId(null);}} style={{background:"transparent",color:"#5a5040",border:"1px solid #2e2a22",borderRadius:8,padding:"7px 14px",fontFamily:"'Noto Serif JP',serif",fontSize:12,cursor:"pointer"}}>キャンセル</button>
+                <button onClick={save} style={{background:"linear-gradient(135deg,#C8A97E,#a8855a)",color:"#1a1a1a",border:"none",borderRadius:8,padding:"7px 16px",fontFamily:"'Noto Serif JP',serif",fontSize:12,cursor:"pointer",fontWeight:700}}>保存</button>
+              </div>
+            </div>
+          )}
+          {assets.length===0&&<div style={{textAlign:"center",color:"#3a3028",padding:"40px 0",fontSize:13}}>資産がありません</div>}
+          {Object.entries(TYPE_LABELS).map(([type,label])=>{
+            const group=assets.filter(a=>a.type===type); if(!group.length) return null;
+            return (
+              <div key={type}>
+                <div style={{fontSize:11,color:TYPE_COLORS[type],marginBottom:6,display:"flex",alignItems:"center",gap:4}}>{TYPE_ICONS[type]} {label}</div>
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  {group.map(a=>(
+                    <div key={a.id} style={{background:"#141414",border:"1px solid #2e2a22",borderRadius:10,padding:"12px 14px",display:"flex",alignItems:"center",gap:10}}>
+                      <div style={{flex:1}}>
+                        <div style={{fontSize:13,color:"#d4c9b0",fontWeight:600}}>{a.name}</div>
+                        <div style={{fontSize:11,color:"#5a5040",marginTop:2}}>{a.type!=="cash"?`${Number(a.amount).toLocaleString()} × ¥${Number(a.price).toLocaleString()}`:`¥${Number(a.amount).toLocaleString()}`}</div>
+                      </div>
+                      <div style={{textAlign:"right"}}>
+                        <div style={{fontSize:14,fontWeight:700,color:"#f0ead6"}}>{formatJPY(a.amount*a.price)}</div>
+                        <div style={{fontSize:10,color:"#5a5040"}}>{total>0?((a.amount*a.price/total)*100).toFixed(1):0}%</div>
+                      </div>
+                      <div style={{display:"flex",gap:4}}>
+                        <button onClick={()=>{setForm({type:a.type,name:a.name,ticker:a.ticker||"",amount:String(a.amount),price:String(a.price)});setEditId(a.id);setShowAdd(true);}} style={{background:"transparent",border:"1px solid #2e2a22",borderRadius:6,color:"#C8A97E",padding:"3px 7px",fontSize:11,cursor:"pointer"}}>編集</button>
+                        <button onClick={()=>setAssets(assets.filter(x=>x.id!==a.id))} style={{background:"transparent",border:"1px solid #2e2a22",borderRadius:6,color:"#8B4444",padding:"3px 7px",fontSize:11,cursor:"pointer"}}>削除</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {sub==="analysis"&&<AIAnalysis assets={assets} memberName={member.name}/>}
+    </div>
+  );
+}
+
+// 家族全体ビュー
+function FamilyView({ data, setData }) {
+  const [showBulkCSV, setShowBulkCSV] = useState(false);
+
+  function handleBulkImport(byMember, mode, isAuto) {
+    if (isAuto) {
+      if (mode === "replace") {
+        setData(byMember);
+      } else {
+        setData(d => {
+          const nd = {...d};
+          Object.entries(byMember).forEach(([id, assets]) => {
+            nd[id] = [...(nd[id]||[]), ...assets];
+          });
+          return nd;
+        });
+      }
+    }
+  }
+  const allAssets = Object.values(data).flat();
+  const familyTotal = allAssets.reduce((s,a)=>s+a.amount*a.price,0);
+  const byType={}; allAssets.forEach(a=>{byType[a.type]=(byType[a.type]||0)+a.amount*a.price;});
+  const donut = Object.entries(byType).map(([t,v])=>({label:TYPE_LABELS[t],value:v,color:TYPE_COLORS[t]}));
+  const memberTotals = MEMBERS.map(m=>({...m,total:(data[m.id]||[]).reduce((s,a)=>s+a.amount*a.price,0)}));
+  const merged={}; allAssets.forEach(a=>{const k=a.ticker||a.name;if(!merged[k])merged[k]={...a,total:0};merged[k].total+=a.amount*a.price;});
+  const ranking=Object.values(merged).sort((a,b)=>b.total-a.total).slice(0,8);
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:14}}>
+      {showBulkCSV && <CSVModal memberName="" autoAssign={true} onImport={handleBulkImport} onClose={()=>setShowBulkCSV(false)}/>}
+      <div style={{display:"flex",justifyContent:"flex-end"}}>
+        <button onClick={()=>setShowBulkCSV(true)} style={{background:"transparent",border:"1px solid #C8A97E55",borderRadius:8,color:"#C8A97E",padding:"8px 16px",fontFamily:"'Noto Serif JP',serif",fontSize:12,cursor:"pointer"}}>📂 一括CSV読込（自動振り分け）</button>
+      </div>
+      <div style={{background:"#141414",border:"1px solid #C8A97E33",borderRadius:12,padding:20,display:"flex",alignItems:"center",gap:16}}>
+        <div style={{fontSize:36}}>👨‍👩‍👧‍👦</div>
+        <div><div style={{fontSize:12,color:"#5a5040"}}>家族総資産</div><div style={{fontSize:28,fontWeight:700,color:"#C8A97E"}}>{formatJPY(familyTotal)}</div></div>
+      </div>
+      <div style={{background:"#141414",border:"1px solid #2e2a22",borderRadius:12,padding:18}}>
+        <div style={{fontSize:13,color:"#C8A97E",fontWeight:600,marginBottom:12}}>👤 メンバー別</div>
+        {memberTotals.map((m,i)=>(
+          <div key={m.id} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<memberTotals.length-1?"1px solid #1e1a14":"none"}}>
+            <span style={{fontSize:22}}>{m.icon}</span>
+            <div style={{flex:1}}>
+              <div style={{fontSize:13,color:"#d4c9b0",fontWeight:600}}>{m.name}</div>
+              <div style={{marginTop:4,height:4,background:"#2a2a2a",borderRadius:2,overflow:"hidden"}}>
+                <div style={{width:`${familyTotal>0?(m.total/familyTotal*100):0}%`,height:"100%",background:"#C8A97E",borderRadius:2}}/>
+              </div>
+            </div>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontSize:14,fontWeight:700,color:"#f0ead6"}}>{formatJPY(m.total)}</div>
+              <div style={{fontSize:10,color:"#5a5040"}}>{familyTotal>0?(m.total/familyTotal*100).toFixed(1):0}%</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{background:"#141414",border:"1px solid #2e2a22",borderRadius:12,padding:20,display:"flex",flexDirection:"column",alignItems:"center",gap:14}}>
+        <div style={{fontSize:13,color:"#C8A97E",fontWeight:600,alignSelf:"flex-start"}}>📊 資産種別配分（家族合計）</div>
+        <DonutChart data={donut} total={familyTotal}/>
+        <div style={{display:"flex",flexWrap:"wrap",gap:10,justifyContent:"center"}}>
+          {donut.map(d=>(
+            <div key={d.label} style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:"#a09070"}}>
+              <span style={{width:10,height:10,borderRadius:2,background:d.color,display:"inline-block"}}/>
+              {d.label} {familyTotal>0?(d.value/familyTotal*100).toFixed(1):0}%
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{background:"#141414",border:"1px solid #2e2a22",borderRadius:12,padding:18}}>
+        <div style={{fontSize:13,color:"#C8A97E",fontWeight:600,marginBottom:12}}>🏆 銘柄ランキング（家族合計）</div>
+        {ranking.map((a,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 0",borderBottom:i<ranking.length-1?"1px solid #1e1a14":"none"}}>
+            <span style={{fontSize:11,color:"#5a5040",width:18}}>#{i+1}</span>
+            <span>{TYPE_ICONS[a.type]||"📦"}</span>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:12,color:"#d4c9b0",fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{a.name}</div>
+              <div style={{fontSize:10,color:"#5a5040"}}>{TYPE_LABELS[a.type]}</div>
+            </div>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontSize:13,fontWeight:700,color:"#f0ead6"}}>{formatJPY(a.total)}</div>
+              <div style={{fontSize:10,color:"#5a5040"}}>{(a.total/familyTotal*100).toFixed(1)}%</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// メインApp
+function App() {
+  const [activeMember, setActiveMember] = useState("family");
+  const [data, setData] = useState(INITIAL_DATA);
+  const [showSync, setShowSync] = useState(false);
+  // localStorage自動保存
+  useEffect(()=>{
+    try{ localStorage.setItem("portfolio_data", JSON.stringify(data)); }catch{}
+  },[data]);
+
+  // localStorage読み込み
+  useEffect(()=>{
+    try{
+      const saved = localStorage.getItem("portfolio_data");
+      if(saved){ const d = JSON.parse(saved); if(d&&d.self) setData(d); }
+    }catch{}
+  },[]);
+
+  const familyTotal = Object.values(data).reduce((s,arr)=>s+arr.reduce((ss,a)=>ss+a.amount*a.price,0),0);
+  const setMemberAssets = (id,assets) => setData(d=>({...d,[id]:assets}));
+
+
+
+
+
+  return (
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;700&family=Shippori+Mincho:wght@400;600&display=swap');
+        *{box-sizing:border-box;margin:0;padding:0;}body{background:#111;}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#111}::-webkit-scrollbar-thumb{background:#2e2a22;border-radius:4px}
+      `}</style>
+      <div style={{minHeight:"100vh",background:"#111",color:"#d4c9b0",fontFamily:"'Noto Serif JP',serif"}}>
+        {showSync && <SyncPanel onClose={()=>setShowSync(false)}/>}
+        <div style={{background:"#0d0d0d",borderBottom:"1px solid #2e2a22",padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:100}}>
+          <div>
+            <div style={{fontSize:17,fontWeight:700,color:"#C8A97E",fontFamily:"'Shippori Mincho',serif",letterSpacing:"0.05em"}}>家族資産管理帳</div>
+            <div style={{fontSize:10,color:"#5a5040",marginTop:1}}>Family Portfolio Manager</div>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <button onClick={()=>setShowSync(true)} style={{background:"transparent",border:"1px solid #2e2a22",borderRadius:8,color:"#5a5040",padding:"6px 12px",fontFamily:"'Noto Serif JP',serif",fontSize:11,cursor:"pointer"}}>☁️ 同期</button>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontSize:10,color:"#5a5040"}}>家族総資産</div>
+              <div style={{fontSize:18,fontWeight:700,color:"#C8A97E"}}>{formatJPY(familyTotal)}</div>
+            </div>
+          </div>
+        </div>
+        <div style={{background:"#0d0d0d",borderBottom:"1px solid #1e1a14",display:"flex",overflowX:"auto"}}>
+          <button onClick={()=>setActiveMember("family")} style={{background:activeMember==="family"?"#141414":"transparent",borderTop:"none",borderLeft:"none",borderRight:"1px solid #1e1a14",borderBottom:activeMember==="family"?"2px solid #C8A97E":"2px solid transparent",padding:"12px 20px",cursor:"pointer",minWidth:80,flexShrink:0}}>
+            <div style={{fontSize:20}}>👨‍👩‍👧‍👦</div>
+            <div style={{fontSize:11,color:activeMember==="family"?"#C8A97E":"#5a5040",marginTop:2}}>家族全体</div>
+            <div style={{fontSize:10,color:activeMember==="family"?"#a8855a":"#3a3028",marginTop:1}}>{formatJPY(familyTotal)}</div>
+          </button>
+          {MEMBERS.map(m=>{
+            const t=(data[m.id]||[]).reduce((s,a)=>s+a.amount*a.price,0);
+            const active=activeMember===m.id;
+            return (
+              <button key={m.id} onClick={()=>setActiveMember(m.id)} style={{background:active?"#141414":"transparent",borderTop:"none",borderLeft:"none",borderRight:"1px solid #1e1a14",borderBottom:active?"2px solid #C8A97E":"2px solid transparent",padding:"12px 20px",cursor:"pointer",minWidth:80,flexShrink:0}}>
+                <div style={{fontSize:20}}>{m.icon}</div>
+                <div style={{fontSize:11,color:active?"#C8A97E":"#5a5040",marginTop:2}}>{m.name}</div>
+                <div style={{fontSize:10,color:active?"#a8855a":"#3a3028",marginTop:1}}>{formatJPY(t)}</div>
+              </button>
+            );
+          })}
+        </div>
+        <div style={{maxWidth:800,margin:"0 auto",padding:16,animation:"fadeUp 0.3s ease"}}>
+          {activeMember==="family"
+            ? <FamilyView data={data} setData={setData}/>
+            : <MemberView key={activeMember} member={MEMBERS.find(m=>m.id===activeMember)} assets={data[activeMember]||[]} setAssets={a=>setMemberAssets(activeMember,a)}/>
+          }
+        </div>
+      </div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+</body>
+</html>
